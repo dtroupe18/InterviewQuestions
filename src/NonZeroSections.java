@@ -1,4 +1,4 @@
-/**
+/*
  * Created by Dave on 6/17/17.
  *
  * Code Test
@@ -73,8 +73,6 @@
  Output
  0
 
-
-
  */
 
 import java.util.Scanner;
@@ -114,7 +112,7 @@ public class NonZeroSections {
         System.out.println("\nNumber of Sections: " + findNumberOfRegions(arrayElements));
     }
 
-    public static int findNumberOfRegions(int[][] a) {
+    private static int findNumberOfRegions(int[][] a) {
         /*
         Logic
              1. Iterate over the array in row major order
@@ -156,10 +154,9 @@ public class NonZeroSections {
                         // either a new section or it is connected to the right
                         // and above somewhere in the current row
                         int startingCol = col;
-                        int startingRow = row;
 
                         while (startingCol < a[0].length - 1) {
-                            rowContinues = a[startingRow][startingCol + 1] == 1;
+                            rowContinues = a[row][startingCol + 1] == 1;
                             if (!rowContinues) {
                                 // new section
                                 break;
@@ -169,7 +166,7 @@ public class NonZeroSections {
                                 rowContinues = false;
                                 break;
                             }
-                            else if (row > 0 && a[startingRow -1][startingCol + 1] == 1) {
+                            else if (row > 0 && a[row -1][startingCol + 1] == 1) {
                                 // rowContinues is true
                                 // check if above space is 1 if it is there is not a new section
                                 colContinues = true;
@@ -193,7 +190,7 @@ public class NonZeroSections {
     }
 
 
-    public static void printArray(int[][] a) {
+    private static void printArray(int[][] a) {
         // Checking Everything
         System.out.println("Number of rows: " + a.length);
         System.out.println("Number of columns " + a[0].length);
