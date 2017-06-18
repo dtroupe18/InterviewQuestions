@@ -9,6 +9,15 @@
  Second  line is the number of columns (n).
  Then it follow with a matrix.
 
+ 4
+ 5
+ 1 0 0 0 1
+ 0 1 1 0 1
+ 0 0 1 1 0
+ 0 1 1 0 0
+
+ Output = 3
+
  Input
  5
  6
@@ -18,8 +27,7 @@
  1 0 0 1 0 0
  0 0 1 1 0 0
 
- Output
- 5
+ Output = 5
 
  Input
  6
@@ -34,6 +42,39 @@
  Output
  3
 
+ Input
+ 4
+ 5
+ 1 0 0 0 1
+ 0 0 1 0 1
+ 0 0 0 1 0
+ 0 1 1 1 0
+
+ Output
+ 4
+
+ Input
+ 3
+ 3
+ 1 1 1
+ 1 1 1
+ 1 1 1
+
+ Output
+ 1
+
+ Input
+ 3
+ 3
+ 0 0 0
+ 0 0 0
+ 0 0 0
+
+ Output
+ 0
+
+
+
  */
 
 import java.util.Scanner;
@@ -42,6 +83,7 @@ public class NonZeroSections {
 
     // main method
     public static void main(String[] args) {
+        // read in user data
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter your data...");
         int numberOfRows = Integer.parseInt(scanner.nextLine());
@@ -73,88 +115,83 @@ public class NonZeroSections {
     }
 
     public static int findNumberOfRegions(int[][] a) {
-        /* Logic
+        /*
+        Logic
              1. Iterate over the array in row major order
              2. If the value is zero we can ignore it
-             3. If the value != 0 set a boolean flag "sectionStarted to true
-             4. Check to see if the section continues
-                    (either the space to the right or the space below must be a 1
-             5. If neither the row nor the column continues the section is over
+             3. If the value != 0 set a boolean flags row/col continues to false
+             4. Check the space above and left if either is 1 we don't have a new section
+             5. If both are zero we check to the right and above until the row ends
+                if it is connected to the right and above at any spot it is NOT a
+                new section. This scenario is exhibited in the following test case:
+                        4
+                        5
+                        1 0 0 0 1
+                        0 0 1 0 1
+                        0 0 0 1 0
+                        0 1 1 1 0
 
-             Corner Case @ (2, 3) row and col don't continue but the section isn't over
-             1 0 0 0 1
-             0 1 1 0 1
-             0 0 1 1 0
-             0 1 1 0 0
-
-
-             We don't have to find the whole section at once because as we iterate
-             over the array if the col or row continued we will eventually reach that
-             spot and see if it continues further.
+                (3, 1) is not a new section
         */
         int numberOfSections = 0;
-        boolean sectionStarted = false;
-        boolean rowContinues = false;
-        boolean colContinues = false;
-        boolean newSection = true;
 
         for (int row = 0; row < a.length; row++) {
             for (int col = 0; col < a[0].length; col++) {
                 // ignore zero spaces as they are not relevant
                 if (a[row][col] != 0) {
-                    sectionStarted = true;
-                    // check what neighbors are in bounds
-                    if (row < a.length - 1) {
-                        // we can check below us
-                        colContinues = a[row + 1][col] > 0;
-                        System.out.println("Checking Space: (" + (row + 1) + ", " + col + ")");
-                        System.out.println("ColContinues: " + colContinues +"\n");
-                        newSection = !colContinues;
+                    // determine if this is a new section
+                    boolean rowContinues = false;
+                    boolean colContinues = false;
 
-
+                    if (row > 0) {
+                        // check above
+                        colContinues = a[row - 1][col] == 1;
                     }
-                    if (col < a[0].length - 1) {
-                        // we can check to the right of us
-                        rowContinues = a[row][col + 1] > 0;
-                        System.out.println("Checking Space: (" + row + ", " + (col + 1) + ")");
-                        System.out.println("RowContinues: " + rowContinues + "\n");
-                        newSection = !rowContinues;
+                    if (col > 0) {
+                        // check left
+                        rowContinues = a[row][col - 1] == 1;
                     }
 
-                    if (newSection) {
-                        System.out.println("New Section is true");
-                        // check other two possible moves "UP and LEFT"
-                        if (row > 0) {
-                            newSection = a[row - 1][col] == 0;
-                            System.out.println("After checking above " + newSection);
+                    if (!colContinues && !rowContinues) {
+                        // either a new section or it is connected to the right
+                        // and above somewhere in the current row
+                        int startingCol = col;
+                        int startingRow = row;
+
+                        while (startingCol < a[0].length - 1) {
+                            rowContinues = a[startingRow][startingCol + 1] == 1;
+                            if (!rowContinues) {
+                                // new section
+                                break;
+                            }
+                            else if (row == 0) {
+                                // can't be connected above so it must be a new section
+                                rowContinues = false;
+                                break;
+                            }
+                            else if (row > 0 && a[startingRow -1][startingCol + 1] == 1) {
+                                // rowContinues is true
+                                // check if above space is 1 if it is there is not a new section
+                                colContinues = true;
+                                break;
+                            }
+                            else {
+                                startingCol++;
+                            }
                         }
-
-                        if (newSection && col > 0) {
-                            newSection = a[row][col - 1] == 0;
-                            System.out.println("After checking left " + newSection);
-                        }
                     }
-                }
 
-
-
-                // section ended if rowContinues/colContinues are both false
-                if (!rowContinues && !colContinues && sectionStarted && newSection) {
-                    System.out.println("Sections increased at (" + row + ", " + (col) + ")\n");
-                    numberOfSections++;
-                    sectionStarted = false;
-                }
-
-                // we are at the last spot in the array and the section hasn't ended
-                // so we need to increment the count
-                if (sectionStarted && row == a.length - 1 && col == a[0].length - 1) {
-                    numberOfSections++;
-                    sectionStarted = false; // not necessary
+                    if (!colContinues && !rowContinues) {
+                        // we have a new section (i.e not connected)
+                        numberOfSections++;
+                        System.out.println("Sections incremented at " + row + ", " + col);
+                    }
                 }
             }
         }
         return numberOfSections;
     }
+
 
     public static void printArray(int[][] a) {
         // Checking Everything
