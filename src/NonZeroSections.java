@@ -76,6 +76,7 @@
  */
 
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class NonZeroSections {
 
@@ -88,19 +89,10 @@ public class NonZeroSections {
         int numberOfColumns = Integer.parseInt(scanner.nextLine());
 
         int[][] arrayElements = new int[numberOfRows][numberOfColumns];
-        int i = 0;
-        int j = 0;
-        while (scanner.hasNext()) {
-            arrayElements[i][j] = Integer.parseInt(scanner.next());
-            if (j == numberOfColumns - 1 && i == numberOfRows - 1) {
-                break;
-            }
-            else if (j == numberOfColumns - 1) {
-                i++;
-                j = 0;
-            }
-            else {
-                j++;
+
+        for (int i = 0; i < numberOfRows; i++) {
+            for (int j = 0; j < numberOfColumns; j++) {
+                arrayElements[i][j] = Integer.parseInt(scanner.next());
             }
         }
         scanner.close();
@@ -153,9 +145,8 @@ public class NonZeroSections {
                     if (!colContinues && !rowContinues) {
                         // either a new section or it is connected to the right
                         // and above somewhere in the current row
-                        int startingCol = col;
 
-                        while (startingCol < a[0].length - 1) {
+                        for (int startingCol = col; startingCol < a[0].length - 1; startingCol++) {
                             rowContinues = a[row][startingCol + 1] == 1;
                             if (!rowContinues) {
                                 // new section
@@ -171,9 +162,6 @@ public class NonZeroSections {
                                 // check if above space is 1 if it is there is not a new section
                                 colContinues = true;
                                 break;
-                            }
-                            else {
-                                startingCol++;
                             }
                         }
                     }
@@ -194,12 +182,9 @@ public class NonZeroSections {
         // Checking Everything
         System.out.println("Number of rows: " + a.length);
         System.out.println("Number of columns " + a[0].length);
-        for (int[] row: a) {
-            System.out.print("\n");
-            for (int x: row) {
-                System.out.print(x + " ");
-            }
-        }
-        System.out.println("\n"); // formatting
+
+        String array = Arrays.deepToString(a).replace("], ", "\n")
+                .replace("[", "").replace(", ", " ").replace("]", "");
+        System.out.println(array);
     }
 }
